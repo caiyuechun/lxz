@@ -1,0 +1,97 @@
+//
+//  PrefixHeader.pch
+//  乐享租
+//
+//  Created by caiyc on 18/3/14.
+//  Copyright © 2018年 changce. All rights reserved.
+//
+
+#ifndef PrefixHeader_pch
+#define PrefixHeader_pch
+#import <Foundation/Foundation.h>
+#import "WToast.h"
+#import "XTool.h"
+#import "CPNavigation.h"
+//#import "CustomTool.h"
+//#import "EaseUI.h"
+#import "UIImage+iconFont.h"
+#import "UIButton+IconButton.h"
+#import "UILabel+IconLable.h"
+#import "NSDictionary+SetNilStr.h"
+#import "MJRefresh.h"
+#import "TBCityIconFont.h"
+#import "SafeKit.h"
+//#import "SHLUILabel.h"
+//#import <Hyphenate/Hyphenate.h>
+#import "AFNetworking.h"
+#import <SDWebImage/UIImageView+WebCache.h>
+#import "CustomLable.h"
+#import "PPRevealSideViewController.h"
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+
+#endif /* PrefixHeader_pch */
+//左边按钮间距
+#define leftSpece 10
+//导航栏上按钮大小
+#define btnSize 40
+#define naviHei 64
+//RGB(235, 67, 60)
+#define BASE_COLOR RGB(235, 67, 60)
+#define MUTI_COLOR RGB(8,58,99)
+#define MUTI_CENTER_COLOR RGB(8,100,100)
+#define navigationBarColor RGB(33, 192, 174)
+#define ICONNAME @"Arvo"
+#define BASE_GRAY_COLOR RGB(190,190,190)
+#define BUTTON_COLOR RGB(235,67,60)
+//价格颜色
+#define PRICECOLOR RGB(203,72,73)
+#define PRICE_COLOR   RGB(203,72,73)
+//分割线颜色 #dedede
+#define separaterColor RGB(222, 222, 222)
+//大面积灰色 #f6f6f6
+#define viewcontrollerColor RGB(246, 246, 246)
+//标题正文颜色 #333333
+#define TITLE_COLOR RGB(51,51,51)
+//二级信息和正文颜色 #666666
+#define SUB_TITLE_COLOR RGB(102,102,102)
+//三级信息和正文颜色 #999999
+#define THIRD_TITLE_COLOR RGB(153,153,153)
+//ps字体像素转换成ios字体大小
+#define kFontSizeWithpx(px) px / 96 * 72
+////设备是否是iphone4
+//#define UI_IS_IPHONE4           (UI_IS_IPHONE && [[UIScreen mainScreen] bounds].size.height < 568.0)
+
+#define screen_width [UIScreen mainScreen].bounds.size.width
+#define screen_height [UIScreen mainScreen].bounds.size.height
+#define iconfont @"iconfont"
+#define USER_INFO @"userInfos"
+#define USER_ID @"user_id"
+#define REMBERPASS @"remeber"
+#define NUMBERFONT_LARGE @"Acrom-Medium"
+#define NUMBERFONT @"Acrom-Regular"
+#define NOMALFONT @"PingFang SC"
+#define NAVIGATIONHEIGHT 64
+#define PAPULARFONTSIZE 25
+#define SHOPCARNOTION @"pushtoCar"
+#define SHOPCARDATA @"shopCarData"
+#define SHOPCARNUMS @"shopNum"
+#define ADDRESS @"address"
+#define ADDRESS_DEFULT @"addressDefult"
+//#define BASE_URL @"http://b2c.c.glsbt.com/api"
+//#define BASE_SERVICE @"http://b2c.c.glsbt.com"
+//#define BASE_IMG_PATH @"http://b2c.c.glsbt.com/index.php?m=Api&c=Goods&a=goodsThumImages&width=400&height=400&goods_id="
+//#define BASE_URL @"http://csps.ynthgy.com/api"
+//#define BASE_SERVICE @"http://csps.ynthgy.com"
+//#define BASE_IMG_PATH @"http://csps.ynthgy.com/index.php?m=Api&c=Goods&a=goodsThumImages&width=400&height=400&goods_id="
+#define BASE_URL @"http://lxz.ynthgy.com/api"
+#define BASE_SERVICE @"http://lxz.ynthgy.com"
+#define BASE_IMG_PATH @"http://lxz.ynthgy.com/index.php?m=Api&c=Goods&a=goodsThumImages&width=400&height=400&goods_id="
+#ifdef DEBUG
+#define SLog(format, ...) printf("class: <%p %s:(%d) > method: %s \n%s\n", self, [[[NSString stringWithUTF8String:__FILE__] lastPathComponent] UTF8String], __LINE__, __PRETTY_FUNCTION__, [[NSString stringWithFormat:(format), ##__VA_ARGS__] UTF8String] )
+#else
+#define SLog(format, ...)
+#endif
+
+#define checkNull(__X__)  (__X__) == [NSNull null] || (__X__) == nil ? @"" : [NSString stringWithFormat:@"%@", (__X__)]

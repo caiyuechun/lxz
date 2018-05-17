@@ -1,0 +1,371 @@
+//
+//  specView.m
+//  testAutoLabel
+//
+//  Created by caiyc on 17/6/6.
+//  Copyright © 2017年 changce. All rights reserved.
+//
+
+#import "specViews.h"
+#import "AutoButton.h"
+#import "BuyCountView.h"
+@implementation specViews 
+{
+    UIScrollView *scro;
+    AutoButton *selectBtn;
+    NSMutableArray *buttonArr;
+    NSDictionary *goods;
+    BuyCountView *countView;
+    UILabel *priceLb;
+    UILabel *store;
+    NSMutableDictionary *specDic;
+    NSString *specStr;
+    NSMutableDictionary *specIDs;
+}
+/*
+// Only override drawRect: if you perform custom drawing.
+// An empty implementation adversely affects performance during animation.
+- (void)drawRect:(CGRect)rect {
+    // Drawing code
+}
+*/
+-(id)initWithDataSource:(NSDictionary *)gooddetail
+{
+    self = [super init];
+    if(self)
+    {
+        specDic = [NSMutableDictionary dictionary];
+        specIDs = [NSMutableDictionary dictionary];
+        buttonArr = [NSMutableArray array];
+        goods = gooddetail;
+        [self layoutViews];
+    }
+    return self;
+}
+-(void)layoutViews
+{
+   // self.backgroundColor = [UIColor redColor];
+    UIView *topView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, screen_width, 100)];
+   // topView.backgroundColor = [UIColor redColor];
+    [self addSubview:topView];
+    
+    UIImageView *images = [[UIImageView alloc]initWithFrame:CGRectMake(10, -10, 100, 100)];
+    [images sd_setImageWithURL:[NSURL URLWithString:goods[@"goods"][@"original_img"]]];
+    [topView addSubview:images];
+    
+    UILabel*priceLbs = [[UILabel alloc]initWithFrame:CGRectMake(120, 10, 40, 20)];
+    priceLbs.text = @"价格:";
+    priceLbs.font = [UIFont systemFontOfSize:13];
+    [topView addSubview:priceLbs];
+    
+    priceLb = [[UILabel alloc]initWithFrame:CGRectMake(160, 10, 100, 20)];
+    priceLb.text =[NSString stringWithFormat:@"%@",goods[@"goods"][@"shop_price"]];
+    priceLb.tag = 103;
+    priceLb.textColor = [UIColor redColor];
+    priceLb.font = [UIFont systemFontOfSize:15];
+    [topView addSubview:priceLb];
+    
+    UILabel *stores = [[UILabel alloc]initWithFrame:CGRectMake(120, 40, 40, 20)];
+    stores.text = @"库存:";
+    stores.font = [UIFont systemFontOfSize:13];
+    [topView addSubview:stores];
+    
+    store = [[UILabel alloc]initWithFrame:CGRectMake(160, 40, 100, 20)];
+    store.text = [NSString stringWithFormat: @"%@",goods[@"goods"][@"store_count"]];
+    store.textColor = [UIColor redColor];
+  //  price.tag = 104;
+    store.font = [UIFont systemFontOfSize:15];
+    [topView addSubview:store];
+    
+    UILabel *detaiLb = [[UILabel alloc]initWithFrame:CGRectMake(120, 70, 100, 20)];
+    detaiLb.text = @"请选择规格";
+    detaiLb.font = [UIFont systemFontOfSize:13];
+    [topView addSubview:detaiLb];
+
+    
+    //加减操作
+    countView = [[BuyCountView alloc]initWithFrame:CGRectMake(0, screen_height/2, screen_width, 40)];
+    [countView.bt_add addTarget:self action:@selector(add) forControlEvents:UIControlEventTouchUpInside];
+   // countView.tf_count.delegate = self;
+    [countView.bt_reduce addTarget:self action:@selector(reduce) forControlEvents:UIControlEventTouchUpInside];
+
+    [self addSubview:countView];
+    
+    //确定按钮
+    UIButton *btn_sure = [UIButton buttonWithType:UIButtonTypeCustom];
+    btn_sure.frame = CGRectMake(0, screen_height/2+50, screen_width, 50);
+    btn_sure.backgroundColor = [UIColor redColor];
+    [btn_sure setTitle:@"确定" forState:UIControlStateNormal];
+    [btn_sure addTarget:self action:@selector(sures) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:btn_sure];
+    
+    
+    buttonArr = [NSMutableArray array];
+    scro = [[UIScrollView alloc]initWithFrame:CGRectMake(0,100, screen_width ,screen_height/2-90)];
+    // scro.backgroundColor = [UIColor redColor];
+    scro.contentSize = CGSizeMake(screen_width, screen_height/2-50);
+    [self addSubview:scro];
+    CGFloat labelHei = 0;
+    for(int i =0;i<[goods[@"goods"][@"goods_spec_list"]count];i++)
+    {
+        
+        CGFloat startX = 10;
+        CGFloat startY = 10;
+        
+        UIView *view = [[UIView alloc]init];
+        
+       
+        //view.backgroundColor = [UIColor orangeColor];
+        UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(10, 5, 300, 30)];
+        titleLabel.text = goods[@"goods"][@"goods_spec_list"][i][@"name"] ;
+       
+        
+        //titleLabel.text = @"规格题目";
+        titleLabel.font = [UIFont systemFontOfSize:14];
+        [view addSubview:titleLabel];
+        startY = 40;
+        labelHei+=40;
+        NSMutableArray *btns = [NSMutableArray array];
+        for(int j =0;j<[goods[@"goods"][@"goods_spec_list"][i][@"list"]count];j++)
+        {
+            NSDictionary *item = goods[@"goods"][@"goods_spec_list"][i][@"list"][j];
+            AutoButton *button = [AutoButton buttonWithType:UIButtonTypeCustom];
+            button.pIndex = i;
+            button.tag = j;
+            
+            [button addTarget:self action:@selector(click:) forControlEvents:UIControlEventTouchUpInside];
+            NSString *str = [item objectForKey:@"item"] ;
+            
+            NSDictionary *dic = [NSDictionary dictionaryWithObject:[UIFont boldSystemFontOfSize:14] forKey:NSFontAttributeName];
+            CGSize size = [str sizeWithAttributes:dic];
+            
+          //  NSLog(@"X坐标%f,Y坐标%f",startX,startY);
+            if(startX+size.width+20+20>screen_width)//每个按钮之间间隙10
+            {
+                startX = 10;
+                startY +=40;
+                labelHei+=40;
+            }
+            
+            button.frame = CGRectMake(startX, startY, size.width+15, 30);
+            [button setTitle:str forState:UIControlStateNormal];
+            [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+            //button.titleLabel.textColor = [UIColor blackColor];
+          // button.backgroundColor = RGB(245, 245, 245);
+          //  button.backgroundColor = [UIColor grayColor];
+           // button.layer.cornerRadius = 5;
+           // button.layer.masksToBounds = 1;
+            button.layer.borderColor = viewcontrollerColor.CGColor;
+            button.layer.borderWidth = 1;
+            button.titleLabel.font = [UIFont systemFontOfSize:14];
+            [view addSubview:button];
+            [btns addObject:button];//按钮加入数组
+            startX+=size.width+20+20;
+
+        }
+        [buttonArr addObject:btns];
+        if(i==0)
+        {
+            view.frame = CGRectMake(0, labelHei-40, screen_width, startY+40);
+            
+        }else{
+            view.frame = CGRectMake(0, labelHei-40, screen_width, startY+40);
+        }
+        UILabel *specLb = [[UILabel alloc]initWithFrame:CGRectMake(10, view.frame.size.height-1, screen_width-20, 1)];
+        specLb.backgroundColor = viewcontrollerColor;
+        [view addSubview:specLb];
+
+        labelHei = view.frame.origin.y+view.frame.size.height;
+        [scro addSubview:view];
+        view.tag = i;
+        scro.contentSize = CGSizeMake(screen_width, labelHei+view.frame.size.height);
+      //  view.backgroundColor = [UIColor orangeColor];
+    }
+
+}
+-(NSString *)objcectToJson:(NSDictionary*)theData isEnd:(BOOL)isend
+{
+    NSMutableString *jsonStrs=[NSMutableString string];
+    [jsonStrs appendString:@"{"];
+    
+    for(int i=0;i<[theData allKeys].count;i++)
+    {
+        NSString *key = [theData allKeys][i];
+        
+        if(i<theData.count-1){
+            [jsonStrs appendString:[NSString stringWithFormat:@"\"%@\":\"%@\",",key,theData[key]]];
+        }else
+        {
+            [jsonStrs appendString:[NSString stringWithFormat:@"\"%@\":\"%@\"",key,theData[key]]];
+        }
+    }
+    if(isend){
+        [jsonStrs appendString:@"}"];
+    }else
+        [jsonStrs appendString:@"},"];
+    return jsonStrs;
+    
+}
+-(void)sures
+{
+    self.sure(countView.tf_count.text,specStr);
+}
+#pragma mark-数量加减
+-(void)add
+{
+    int count =[countView.tf_count.text intValue];
+    countView.tf_count.text = [NSString stringWithFormat:@"%d",count+1];
+//    if (count < self.stock) {
+//        countView.tf_count.text = [NSString stringWithFormat:@"%d",count+1];
+//    }else
+//    {
+//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"数量超出范围" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil];
+//        [alert show];
+//    }
+}
+-(void)reduce
+{
+    int count =[countView.tf_count.text intValue];
+    if (count > 1) {
+        countView.tf_count.text = [NSString stringWithFormat:@"%d",count-1];
+    }else
+    {
+        //        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"数量超出范围" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil];
+        //        alert.tag = 100;
+        //        [alert show];
+    }
+}
+
+-(void)click:(AutoButton *)button
+{
+    
+    
+    
+    NSLog(@"选中状态%d",button.selected);
+    NSArray *arrs = buttonArr[button.pIndex];
+    NSString *ids=[NSString stringWithFormat:@"%@",goods[@"goods"][@"goods_spec_list"][button.pIndex][@"list"][button.tag][@"item_id"]];
+    NSString *price = [goods[@"spec_goods_price"]objectForKey:ids][@"price"];
+    NSString *stores =[ goods[@"spec_goods_price"]objectForKey:ids][@"store_count"];
+    NSLog(@"价格%@", price);
+   
+    priceLb.text = [NSString stringWithFormat:@"价格：%@",price];
+    store.text = [NSString stringWithFormat:@"库存：%@",stores];
+    
+    for(AutoButton *btn in arrs)
+    {
+        if(btn!=button){
+            
+            btn.selected = 0;
+            [btn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+            btn.layer.borderColor = viewcontrollerColor.CGColor;
+        //    btn.backgroundColor = RGB(255, 255, 255);
+        }
+    }
+    
+    if(button.selected==NO)
+    {
+        //如果未选中
+       // button.backgroundColor = [UIColor redColor];
+        [button setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+        button.layer.borderColor = [UIColor redColor].CGColor;
+        button.selected = YES;
+        NSString *keys = goods[@"goods"][@"goods_spec_list"][button.pIndex][@"name"];
+        NSString *vclue = button.titleLabel.text;
+        NSString *item_id = goods[@"goods"][@"goods_spec_list"][button.pIndex][@"list"][button.tag][@"item_id"];
+        [specDic setObject:vclue forKey:keys];
+        [specIDs setObject:item_id forKey:keys];
+        specStr = [self objcectToJson:specDic isEnd:1];
+        //变化价格
+        if(specDic.count==[goods[@"goods"][@"goods_spec_list"]count])
+        {
+            NSMutableArray *array = [NSMutableArray arrayWithArray: specIDs.allValues];
+            for (int  i =0; i<[array count]-1; i++) {
+                
+                for (int j = i+1; j<[array count]; j++) {
+                    
+                    if ([array[i] intValue]>[array[j] intValue]) {
+                        
+                        //交换
+                        
+                        [array exchangeObjectAtIndex:i withObjectAtIndex:j];
+                        
+                    }
+                    
+                }
+                
+            }
+            NSLog(@"交换后的数组…%@",array);
+            NSString *itemkey = [array componentsJoinedByString:@"_"];
+            NSDictionary *priceDic = goods[@"spec_goods_price"];
+            NSDictionary *dic = [priceDic objectForKey:itemkey];
+            NSString *price = dic[@"price"];
+            priceLb.text = [NSString stringWithFormat:@"%@",price];
+            store.text = [NSString stringWithFormat:@"%@",dic[@"store_count"]];
+
+        }
+        
+        
+    }else
+    {
+        //如果选中
+        button.selected = NO;
+        [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        button.layer.borderColor = viewcontrollerColor.CGColor;
+       // button.backgroundColor = RGB(255, 255, 255);
+        
+        NSString *keys = goods[@"goods"][@"goods_spec_list"][button.pIndex][@"name"];
+       // NSString *vclue = button.titleLabel.text;
+        [specDic removeObjectForKey:keys];
+         [specIDs removeObjectForKey:keys];
+        if(specDic.count==0)
+        {
+            specStr = @"";
+        }
+        else
+        {
+        specStr = [self objcectToJson:specDic isEnd:1];
+        }
+
+    }
+    
+    NSLog(@"json=%@",specStr);
+   // self.selctSpec(specStr);
+}
+-(NSString *)convertToJsonData:(NSDictionary *)dict
+
+{
+    
+    NSError *error;
+    
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error:&error];
+    
+    NSString *jsonString;
+    
+    if (!jsonData) {
+        
+        NSLog(@"%@",error);
+        
+    }else{
+        
+        jsonString = [[NSString alloc]initWithData:jsonData encoding:NSUTF8StringEncoding];
+        
+    }
+    
+    NSMutableString *mutStr = [NSMutableString stringWithString:jsonString];
+    
+    NSRange range = {0,jsonString.length};
+    
+    //去掉字符串中的空格
+    
+    [mutStr replaceOccurrencesOfString:@" " withString:@"" options:NSLiteralSearch range:range];
+    
+    NSRange range2 = {0,mutStr.length};
+    
+    //去掉字符串中的换行符
+    
+    [mutStr replaceOccurrencesOfString:@"\n" withString:@"" options:NSLiteralSearch range:range2];
+    
+    return mutStr;
+    
+}
+@end

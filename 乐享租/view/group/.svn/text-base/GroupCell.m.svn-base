@@ -1,0 +1,24 @@
+//
+//  GroupCell.m
+//  SHOP
+//
+//  Created by caiyc on 16/12/1.
+//  Copyright © 2016年 changce. All rights reserved.
+//  分类内容
+
+#import "GroupCell.h"
+
+@implementation GroupCell
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    // Initialization code
+}
+-(void)bindData:(NSDictionary *)diction
+{
+    //NSString *imageUrl = [NSString stringWithFormat:@"%@%@",BASE_PATH,diction[@"image"]];
+    NSString *url = [NSString stringWithFormat:@"%@%@",BASE_SERVICE, diction[@"image"]];
+    [self.iconImage sd_setImageWithURL:[NSURL URLWithString:url] placeholderImage:[UIImage imageNamed:@"goods_icon"]];
+    self.name.text = diction[@"mobile_name"];
+}
+@end

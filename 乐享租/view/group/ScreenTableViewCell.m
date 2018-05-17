@@ -1,0 +1,196 @@
+//
+//  ScreenTableViewCell.m
+//  chuangyi
+//
+//  Created by yncc on 17/8/8.
+//  Copyright © 2017年 changce. All rights reserved.
+//
+
+#import "ScreenTableViewCell.h"
+
+@interface ScreenTableViewCell ()
+
+@property (nonatomic,assign) NSInteger height;
+@property (nonatomic,assign) NSInteger index;
+@property (nonatomic,assign) BOOL isSelect;
+@property (nonatomic,strong) NSDictionary *dicInfo;
+@property (nonatomic,strong) NSIndexPath *indexpath;
+@end
+
+@implementation ScreenTableViewCell
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    
+}
+-(void)bindData:(NSDictionary *)dicInfo indexpath:(NSIndexPath *)indexpath{
+    _dicInfo = dicInfo;
+    
+    if (![[_dicInfo objectForKey:@"select"]boolValue]) {
+        [_rightIcon setFrame:CGRectMake(self.contentView.bounds.size.width-30, 5, 10, 20)];
+        [_rightIcon setImage:[UIImage imageNamed:@"right"]];
+        
+    }else{
+        [_rightIcon setFrame:CGRectMake(self.contentView.bounds.size.width-30, 10, 20, 10)];
+        [_rightIcon setImage:[UIImage imageNamed:@"bottom"]];
+        
+    }
+    _isSelect = [[_dicInfo objectForKey:@"select"]boolValue];
+    
+    
+    // 按钮高度
+    CGFloat btnH = 28;
+    // 距离左边距
+    CGFloat leftX = 6;
+    // 距离上边距
+    CGFloat topY = 10;
+    // 按钮左右间隙
+    CGFloat marginX = 10;
+    // 按钮上下间隙
+    CGFloat marginY = 10;
+    // 文字左右间隙
+    CGFloat fontMargin = 10;
+    
+    _height = 28+10;
+    
+    _index = indexpath.row;
+    _indexpath = indexpath;
+    
+    
+    [_lbTitle setText:[dicInfo objectForKey:@"name"]];
+    NSArray *_tagArray = [dicInfo objectForKey:@"item"];
+    //    NSArray *_tagArray = @[@"sjjs",@"40",@"chichun",@"sslsl",@"skks",@"skskl"];
+    for (int i = 0; i < _tagArray.count; i ++) {
+        NSDictionary *dic = [_tagArray objectAtIndex:i];
+        
+        UIButton* btn = [UIButton buttonWithType:UIButtonTypeCustom];
+        btn.frame = CGRectMake(marginX + leftX, topY, 100, btnH);
+        btn.tag = i;
+        // 按钮文字
+        [btn setTitle:dic[@"name"] forState:UIControlStateNormal];
+        if([dic[@"name"]isEqualToString:@""])
+        {
+            continue;
+        }
+        //------ 默认样式
+        //按钮文字默认样式
+        NSMutableAttributedString* btnDefaultAttr = [[NSMutableAttributedString alloc]initWithString:btn.titleLabel.text];
+        // 文字大小
+        [btnDefaultAttr addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:13] range:NSMakeRange(0, btn.titleLabel.text.length)];
+        // 默认颜色
+        [btnDefaultAttr addAttribute:NSForegroundColorAttributeName value:[UIColor darkGrayColor] range:NSMakeRange(0, btn.titleLabel.text.length)];
+        [btn setAttributedTitle:btnDefaultAttr forState:UIControlStateNormal];
+        
+        // 默认背景颜色RGB(240, 242, 245)
+        [btn setBackgroundImage:[self imageWithColor:[UIColor colorWithRed:240/255.0 green:242/255.0 blue:245/255.0 alpha:0.8]] forState:UIControlStateNormal];
+        
+        
+        // 圆角
+        btn.layer.cornerRadius = 8.0f;
+        btn.layer.masksToBounds = YES;
+        // 边框
+        //        btn.layer.borderColor = [UIColor lightGrayColor].CGColor;
+        //        btn.layer.borderWidth = 0.5;
+        
+        // 设置按钮的边距、间隙
+        [self setTagButtonMargin:btn fontMargin:fontMargin];
+        
+        // 处理换行
+        if (btn.frame.origin.x + btn.frame.size.width + marginX > self.frame.size.width) {
+            // 换行
+            topY += btnH + marginY;
+            
+            // 重置
+            leftX = 6;
+            btn.frame = CGRectMake(marginX + leftX, topY, 100, btnH);
+            _height += 28+10;
+            // 设置按钮的边距、间隙
+            [self setTagButtonMargin:btn fontMargin:fontMargin];
+        }
+        
+        // 重置高度
+        CGRect frame = btn.frame;
+        frame.size.height = btnH;
+        btn.frame = frame;
+        
+        //----- 选中事件
+        [btn addTarget:self action:@selector(selectdButton:) forControlEvents:UIControlEventTouchUpInside];
+        
+        //        [self addSubview:btn];
+        
+        
+        
+        leftX += btn.frame.size.width + marginX;
+        
+        [self.contView addSubview:btn];
+        
+
+
+    }
+            if (!_isSelect) {
+                self.contView.hidden = YES;
+                [self.contView setFrame:CGRectMake(0, 40, self.contentView.bounds.size.width, 0)];
+    
+            }else{
+                self.contView.hidden = NO;
+    [self.contView setFrame:CGRectMake(0, 40, self.bounds.size.width, _height+10)];
+            }
+       NSLog(@"topY  %ld",(long)_height);
+    NSLog(@"%@",dicInfo);
+    
+}
+// 根据颜色生成UIImage
+- (UIImage*)imageWithColor:(UIColor*)color{
+    
+    CGRect rect = CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
+    // 开始画图的上下文
+    UIGraphicsBeginImageContext(rect.size);
+    
+    // 设置背景颜色
+    [color set];
+    // 设置填充区域
+    UIRectFill(CGRectMake(0, 0, rect.size.width, rect.size.height));
+    
+    // 返回UIImage
+    UIImage* image = UIGraphicsGetImageFromCurrentImageContext();
+    // 结束上下文
+    UIGraphicsEndImageContext();
+    return image;
+}
+
+// 设置按钮的边距、间隙
+- (void)setTagButtonMargin:(UIButton*)btn fontMargin:(CGFloat)fontMargin{
+    
+    // 按钮自适应
+    [btn sizeToFit];
+    
+    // 重新计算按钮文字左右间隙
+    CGRect frame = btn.frame;
+    frame.size.width += fontMargin*2;
+    btn.frame = frame;
+}
+-(void)selectdButton:(UIButton *)sender{
+    NSLog(@"skksk %lu",sender.tag);
+    [_delegate selectdButton:_index itemIndex:sender.tag];
+}
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+    
+    // Configure the view for the selected state
+}
+//点击了头部
+- (IBAction)clickHeaderAction:(UIButton *)sender {
+    _isSelect = !_isSelect;
+    //    if (!_isSelect) {
+    //        [_rightIcon setFrame:CGRectMake(self.contentView.bounds.size.width-30, 5, 10, 20)];
+    //        [_rightIcon setImage:[UIImage imageNamed:@"right"]];
+    //    }else{
+    //        [_rightIcon setFrame:CGRectMake(self.contentView.bounds.size.width-30, 10, 20, 10)];
+    //
+    //        [_rightIcon setImage:[UIImage imageNamed:@"bottom"]];
+    //    }
+    [_delegate reloadData:_isSelect index:_indexpath];
+}
+
+
+@end
